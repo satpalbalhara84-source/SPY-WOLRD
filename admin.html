@@ -622,7 +622,7 @@ async function uploadProductImage(file) {
       "apikey": PUBLIC_KEY,
       "Authorization": "Bearer " + ACCESS_TOKEN,
       "Content-Type": file.type,
-      "x-upsert": "true"
+      "x-upsert": "false"
     },
     body: file
   });
