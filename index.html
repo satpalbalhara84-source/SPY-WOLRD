@@ -14,15 +14,15 @@
 <script>
 // STEP 1: Replace both placeholders with your own Supabase Project URL and publishable/anon key.
 // Never paste a service_role or secret key into this public website.
-const SUPABASE_URL = "https://aesbevkyrfosxevpajqu.supabase.co";
-const SUPABASE_ANON_KEY = "sb_publishable_k5-HzlrAP3IepkFBKk3e8w_S5cxSU41";
+const SUPABASE_URL = "https://hlevuiqokhckksoqxrod.supabase.co";
+const SUPABASE_ANON_KEY = "sb_publishable_k5-HzlrAP3IepkFBKk3e8w_S5cxSU41ye";
 const PHONE = "917206352583";
 let db=null, products=[], cart={}, category="All";
 const money=n=>"₹"+Number(n).toLocaleString("en-IN");
 function configured(){return SUPABASE_URL.startsWith("https://")&&!SUPABASE_URL.includes("PASTE_")&&SUPABASE_ANON_KEY.length>20&&!SUPABASE_ANON_KEY.includes("PASTE_")}
 async function init(){if(!configured()){document.getElementById("status").textContent="Setup required: add your Supabase URL and publishable/anon key in this HTML file.";return}
  db=window.supabase.createClient(SUPABASE_URL,SUPABASE_ANON_KEY);
- const {data,error}=await db.from("products").select("id,name,slug,category,description,price,compare_at_price,image_url,stock").eq("is_active",true).order("created_at",{ascending:false});
+ const {data,error}=await db.from("products").select("id,name,category,description,price,image_url,active,created_at").eq("active",true).order("created_at",{ascending:false});
  if(error){document.getElementById("status").textContent="Could not load products: "+error.message;return}
  products=data||[];document.getElementById("status").textContent=products.length+" products available • Prices shown in INR";renderFilters();render()}
 function renderFilters(){const cats=["All",...new Set(products.map(p=>p.category))];document.getElementById("filters").innerHTML=cats.map(c=>`<button class="filter ${c===category?"active":""}" onclick="category=${JSON.stringify(c)};renderFilters();render()">${esc(c)}</button>`).join("")}
