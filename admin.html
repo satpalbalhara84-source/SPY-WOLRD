@@ -1,0 +1,674 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#071522">
+<title>Spy World | Admin Panel</title>
+
+<style>
+:root{
+  --bg:#071522;
+  --card:#102638;
+  --teal:#17d6c1;
+  --text:#f4f8fb;
+  --muted:#a9bac8;
+  --line:#244255;
+}
+*{box-sizing:border-box}
+body{
+  margin:0;
+  font-family:Arial,sans-serif;
+  background:var(--bg);
+  color:var(--text);
+}
+button,input,select,textarea{font:inherit}
+.wrap{max-width:1150px;margin:auto;padding:20px}
+header{
+  background:#091b29;
+  border-bottom:1px solid var(--line);
+}
+.head{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:15px;
+  flex-wrap:wrap;
+}
+.brand{font-size:23px;font-weight:900}
+.brand span{color:var(--teal)}
+.panel{
+  background:var(--card);
+  border:1px solid var(--line);
+  border-radius:15px;
+  padding:20px;
+  margin:18px 0;
+}
+h1{font-size:28px}
+h2{font-size:20px}
+.muted,.hint{
+  color:var(--muted);
+  font-size:13px;
+  line-height:1.7;
+}
+.field{display:grid;gap:7px;margin:12px 0}
+.field label{font-size:13px;color:var(--muted)}
+.field input,.field select,.field textarea{
+  width:100%;
+  padding:12px;
+  color:white;
+  background:#071a27;
+  border:1px solid var(--line);
+  border-radius:9px;
+}
+.btn{
+  border:0;
+  border-radius:9px;
+  padding:11px 15px;
+  font-weight:bold;
+  cursor:pointer;
+}
+.primary{background:var(--teal);color:#04151c}
+.secondary{background:#183346;color:white;border:1px solid var(--line)}
+.danger{background:#672d37;color:white}
+.actions{display:flex;gap:9px;flex-wrap:wrap}
+.grid{
+  display:grid;
+  grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:12px;
+}
+.stats{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:12px;
+}
+.stat{
+  background:#091b29;
+  border:1px solid var(--line);
+  border-radius:12px;
+  padding:17px;
+}
+.stat strong{
+  display:block;
+  font-size:27px;
+  margin-top:8px;
+}
+.tablewrap{overflow:auto}
+table{width:100%;border-collapse:collapse;min-width:650px}
+th,td{
+  text-align:left;
+  padding:12px;
+  border-bottom:1px solid var(--line);
+  font-size:13px;
+}
+th{color:var(--teal)}
+.hidden{display:none!important}
+.status{
+  color:#8ff6e6;
+  background:#173a43;
+  padding:5px 8px;
+  border-radius:7px;
+}
+.message{white-space:pre-wrap;overflow-wrap:anywhere}
+a{color:var(--teal)}
+@media(max-width:700px){
+  .grid,.stats{grid-template-columns:1fr}
+  .wrap{padding:13px}
+}
+</style>
+</head>
+
+<body>
+
+<header>
+  <div class="wrap head">
+    <div class="brand">SPY <span>WORLD</span> / ADMIN</div>
+    <div class="actions">
+      <a class="btn secondary" href="./index.html">Open Store ↗</a>
+      <button id="logoutBtn" class="btn danger hidden"
+        onclick="logout()">Logout</button>
+    </div>
+  </div>
+</header>
+
+<main class="wrap">
+  <h1>Store Dashboard</h1>
+  <p class="muted">
+    Manage your products, prices and customer orders.
+  </p>
+
+  <!-- LOGIN -->
+  <section class="panel" id="loginPanel">
+    <h2>Admin Login</h2>
+    <p class="hint">
+      Use an account created in your NEW Supabase project.
+      A regular customer account should not automatically have admin access.
+    </p>
+
+    <div class="field">
+      <label for="projectUrl">Supabase Project URL</label>
+      <input id="projectUrl"
+        placeholder="https://YOUR-NEW-PROJECT-ID.supabase.co">
+    </div>
+
+    <div class="field">
+      <label for="publicKey">Supabase Publishable Key</label>
+      <input id="publicKey" type="password"
+        placeholder="sb_publishable_...">
+    </div>
+
+    <div class="field">
+      <label for="email">Admin Email</label>
+      <input id="email" type="email"
+        autocomplete="username" required>
+    </div>
+
+    <div class="field">
+      <label for="password">Admin Password</label>
+      <input id="password" type="password"
+        autocomplete="current-password" required>
+    </div>
+
+    <button class="btn primary" id="loginBtn"
+      onclick="login()">Login to Dashboard</button>
+
+    <p id="loginMessage" class="hint message"></p>
+  </section>
+
+  <!-- DASHBOARD -->
+  <section id="dashboard" class="hidden">
+
+    <div class="stats">
+      <div class="stat">
+        Products
+        <strong id="productCount">0</strong>
+      </div>
+      <div class="stat">
+        Total Orders
+        <strong id="orderCount">0</strong>
+      </div>
+      <div class="stat">
+        New Orders
+        <strong id="newCount">0</strong>
+      </div>
+    </div>
+
+    <!-- PRODUCT FORM -->
+    <section class="panel">
+      <h2>Add / Edit Product</h2>
+
+      <input type="hidden" id="productId">
+
+      <div class="grid">
+        <div class="field">
+          <label>Product Name *</label>
+          <input id="pName" maxlength="120" required>
+        </div>
+
+        <div class="field">
+          <label>Category *</label>
+          <select id="pCategory">
+            <option>Mini Camera</option>
+            <option>WiFi Camera</option>
+            <option>Button Camera</option>
+            <option>Accessories</option>
+          </select>
+        </div>
+
+        <div class="field">
+          <label>Price (₹) *</label>
+          <input id="pPrice" type="number" min="0" step="0.01">
+        </div>
+
+        <div class="field">
+          <label>Old Price (₹)</label>
+          <input id="pOldPrice" type="number" min="0" step="0.01">
+        </div>
+
+        <div class="field">
+          <label>Product Tag</label>
+          <input id="pTag" maxlength="30" placeholder="POPULAR">
+        </div>
+
+        <div class="field">
+          <label>Product Status</label>
+          <select id="pActive">
+            <option value="true">Active</option>
+            <option value="false">Inactive</option>
+          </select>
+        </div>
+
+        <div class="field" style="grid-column:1/-1">
+          <label>Image URL (optional)</label>
+          <input id="pImage" type="url"
+            placeholder="https://example.com/product.jpg">
+        </div>
+
+        <div class="field" style="grid-column:1/-1">
+          <label>Description</label>
+          <textarea id="pDescription" rows="3"
+            maxlength="500"></textarea>
+        </div>
+      </div>
+
+      <div class="actions">
+        <button class="btn primary" onclick="saveProduct()">
+          Save Product
+        </button>
+        <button class="btn secondary" onclick="resetProduct()">
+          Clear Form
+        </button>
+        <button class="btn secondary" onclick="loadAll()">
+          Refresh Data
+        </button>
+      </div>
+
+      <p id="productMessage" class="hint message"></p>
+    </section>
+
+    <!-- PRODUCTS TABLE -->
+    <section class="panel">
+      <h2>Manage Products</h2>
+      <div class="tablewrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Product</th>
+              <th>Category</th>
+              <th>Price</th>
+              <th>Status</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody id="productsBody"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- ORDERS TABLE -->
+    <section class="panel">
+      <h2>Customer Orders</h2>
+      <p class="hint">
+        Customer information is private. Only authorized admins
+        should be able to view order details.
+      </p>
+      <div class="tablewrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Order ID</th>
+              <th>Customer</th>
+              <th>Phone</th>
+              <th>Total</th>
+              <th>Status</th>
+              <th>Update</th>
+            </tr>
+          </thead>
+          <tbody id="ordersBody"></tbody>
+        </table>
+      </div>
+    </section>
+  </section>
+</main>
+
+<script>
+/*
+  Spy World Admin Panel
+
+  Paste your NEW Supabase URL and publishable key
+  in the login form.
+
+  This page uses Supabase Auth for login.
+  Database permissions must also authorize verified admins.
+  Never use a service_role key in browser code.
+*/
+
+let BASE_URL = "";
+let PUBLIC_KEY = "";
+let ACCESS_TOKEN = "";
+let REFRESH_TOKEN = "";
+let currentUser = null;
+let productRows = [];
+let orderRows = [];
+
+const $ = id => document.getElementById(id);
+
+function safeText(value) {
+  return String(value ?? "").replace(/[&<>"']/g, ch => ({
+    "&":"&amp;",
+    "<":"&lt;",
+    ">":"&gt;",
+    '"':"&quot;",
+    "'":"&#39;"
+  })[ch]);
+}
+
+function money(value) {
+  return "₹" + Number(value || 0).toLocaleString("en-IN");
+}
+
+function setMessage(id, message) {
+  $(id).textContent = message;
+}
+
+function apiHeaders(extra = {}) {
+  return {
+    "apikey": PUBLIC_KEY,
+    "Authorization": "Bearer " + ACCESS_TOKEN,
+    "Content-Type": "application/json",
+    ...extra
+  };
+}
+
+async function request(path, options = {}) {
+  const response = await fetch(BASE_URL + "/rest/v1/" + path, {
+    ...options,
+    headers: apiHeaders(options.headers || {})
+  });
+
+  if (!response.ok) {
+    let message = "Request failed: " + response.status;
+
+    try {
+      const data = await response.json();
+      message = data.message || data.msg || message;
+      if (data.hint) message += " — " + data.hint;
+    } catch (e) {}
+
+    throw new Error(message);
+  }
+
+  if (response.status === 204) return null;
+
+  const text = await response.text();
+  return text ? JSON.parse(text) : null;
+}
+
+async function login() {
+  const url = $("projectUrl").value.trim().replace(/\/+$/, "");
+  const key = $("publicKey").value.trim();
+  const email = $("email").value.trim();
+  const password = $("password").value;
+
+  if (!url.startsWith("https://") || !key || !email || !password) {
+    setMessage("loginMessage",
+      "Enter the Supabase URL, publishable key, email and password.");
+    return;
+  }
+
+  if (!/^[a-zA-Z0-9.-]+$/.test(new URL(url).hostname)) {
+    setMessage("loginMessage", "Please check your project URL.");
+    return;
+  }
+
+  BASE_URL = url;
+  PUBLIC_KEY = key;
+
+  $("loginBtn").disabled = true;
+  setMessage("loginMessage", "Signing in...");
+
+  try {
+    const response = await fetch(
+      BASE_URL + "/auth/v1/token?grant_type=password",
+      {
+        method: "POST",
+        headers: {
+          "apikey": PUBLIC_KEY,
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ email, password })
+      }
+    );
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      throw new Error(data.msg || data.message ||
+        "Login failed. Check your credentials.");
+    }
+
+    ACCESS_TOKEN = data.access_token;
+    REFRESH_TOKEN = data.refresh_token;
+    currentUser = data.user;
+
+    /*
+      The page verifies access through database RLS.
+      Authentication alone does not grant admin privileges.
+    */
+    $("loginPanel").classList.add("hidden");
+    $("dashboard").classList.remove("hidden");
+    $("logoutBtn").classList.remove("hidden");
+
+    await loadAll();
+
+    setMessage("loginMessage", "");
+  } catch (error) {
+    setMessage("loginMessage",
+      "Could not open dashboard: " + error.message);
+    ACCESS_TOKEN = "";
+    REFRESH_TOKEN = "";
+    currentUser = null;
+  } finally {
+    $("loginBtn").disabled = false;
+  }
+}
+
+function logout() {
+  ACCESS_TOKEN = "";
+  REFRESH_TOKEN = "";
+  currentUser = null;
+  productRows = [];
+  orderRows = [];
+
+  $("dashboard").classList.add("hidden");
+  $("loginPanel").classList.remove("hidden");
+  $("logoutBtn").classList.add("hidden");
+  setMessage("loginMessage", "Logged out.");
+}
+
+async function loadAll() {
+  try {
+    productRows = await request(
+      "products?select=*&order=created_at.desc"
+    );
+
+    orderRows = await request(
+      "orders?select=id,order_ref,customer_name,phone,total_amount,status,created_at&order=created_at.desc&limit=200"
+    );
+
+    drawProducts();
+    drawOrders();
+
+    $("productCount").textContent = productRows.length;
+    $("orderCount").textContent = orderRows.length;
+    $("newCount").textContent =
+      orderRows.filter(o => o.status === "new").length;
+
+  } catch (error) {
+    alert(
+      "Database access failed.\n\n" + error.message +
+      "\n\nCheck your Supabase RLS policies and admin authorization."
+    );
+    throw error;
+  }
+}
+
+function drawProducts() {
+  $("productsBody").innerHTML = productRows.map(p => `
+    <tr>
+      <td>${safeText(p.name)}</td>
+      <td>${safeText(p.category)}</td>
+      <td>${money(p.price)}</td>
+      <td>${p.active
+        ? '<span class="status">Active</span>'
+        : "Inactive"}</td>
+      <td>
+        <div class="actions">
+          <button class="btn secondary"
+            onclick="editProduct('${p.id}')">Edit</button>
+          <button class="btn danger"
+            onclick="toggleProduct('${p.id}',${!p.active})">
+            ${p.active ? "Disable" : "Enable"}
+          </button>
+        </div>
+      </td>
+    </tr>
+  `).join("") ||
+    '<tr><td colspan="5">No products found.</td></tr>';
+}
+
+function drawOrders() {
+  $("ordersBody").innerHTML = orderRows.map(o => `
+    <tr>
+      <td>${safeText(o.order_ref || o.id)}</td>
+      <td>${safeText(o.customer_name)}</td>
+      <td>${safeText(o.phone)}</td>
+      <td>${money(o.total_amount)}</td>
+      <td>${safeText(o.status)}</td>
+      <td>
+        <select id="status_${o.id}">
+          ${["new","confirmed","shipped","completed","cancelled"]
+            .map(s => `<option value="${s}"
+              ${o.status === s ? "selected" : ""}>
+              ${s}
+            </option>`).join("")}
+        </select>
+        <button class="btn primary"
+          onclick="updateStatus('${o.id}')">Save</button>
+      </td>
+    </tr>
+  `).join("") ||
+    '<tr><td colspan="6">No orders found.</td></tr>';
+}
+
+function editProduct(id) {
+  const p = productRows.find(item => item.id === id);
+  if (!p) return;
+
+  $("productId").value = p.id;
+  $("pName").value = p.name || "";
+  $("pCategory").value = p.category || "Mini Camera";
+  $("pPrice").value = p.price ?? "";
+  $("pOldPrice").value = p.old_price ?? "";
+  $("pTag").value = p.tag || "";
+  $("pImage").value = p.image_url || "";
+  $("pDescription").value = p.description || "";
+  $("pActive").value = String(p.active);
+
+  window.scrollTo({ top: 0, behavior: "smooth" });
+}
+
+function resetProduct() {
+  $("productId").value = "";
+  $("pName").value = "";
+  $("pCategory").value = "Mini Camera";
+  $("pPrice").value = "";
+  $("pOldPrice").value = "";
+  $("pTag").value = "";
+  $("pImage").value = "";
+  $("pDescription").value = "";
+  $("pActive").value = "true";
+  setMessage("productMessage", "");
+}
+
+async function saveProduct() {
+  const name = $("pName").value.trim();
+  const price = Number($("pPrice").value);
+  const oldText = $("pOldPrice").value.trim();
+  const oldPrice = oldText === "" ? null : Number(oldText);
+  const imageUrl = $("pImage").value.trim();
+
+  if (!name || $("pPrice").value === "" ||
+      !Number.isFinite(price) || price < 0) {
+    setMessage("productMessage",
+      "Enter a product name and valid price.");
+    return;
+  }
+
+  if (oldPrice !== null &&
+      (!Number.isFinite(oldPrice) || oldPrice < 0)) {
+    setMessage("productMessage", "Check the old price.");
+    return;
+  }
+
+  if (imageUrl && !/^https?:\/\//i.test(imageUrl)) {
+    setMessage("productMessage",
+      "Image URL must begin with http:// or https://.");
+    return;
+  }
+
+  const body = {
+    name,
+    category: $("pCategory").value,
+    price,
+    old_price: oldPrice,
+    tag: $("pTag").value.trim() || null,
+    image_url: imageUrl || null,
+    description: $("pDescription").value.trim() || null,
+    active: $("pActive").value === "true"
+  };
+
+  try {
+    const id = $("productId").value;
+
+    if (id) {
+      await request("products?id=eq." + encodeURIComponent(id), {
+        method: "PATCH",
+        headers: { "Prefer": "return=minimal" },
+        body: JSON.stringify(body)
+      });
+    } else {
+      await request("products", {
+        method: "POST",
+        headers: { "Prefer": "return=minimal" },
+        body: JSON.stringify(body)
+      });
+    }
+
+    setMessage("productMessage", "Product saved.");
+    resetProduct();
+    await loadAll();
+
+  } catch (error) {
+    setMessage("productMessage",
+      "Save failed: " + error.message);
+  }
+}
+
+async function toggleProduct(id, active) {
+  if (!confirm("Change this product's active status?")) return;
+
+  try {
+    await request("products?id=eq." + encodeURIComponent(id), {
+      method: "PATCH",
+      headers: { "Prefer": "return=minimal" },
+      body: JSON.stringify({ active })
+    });
+
+    await loadAll();
+  } catch (error) {
+    alert("Update failed: " + error.message);
+  }
+}
+
+async function updateStatus(id) {
+  const status = $("status_" + id).value;
+
+  try {
+    await request("orders?id=eq." + encodeURIComponent(id), {
+      method: "PATCH",
+      headers: { "Prefer": "return=minimal" },
+      body: JSON.stringify({ status })
+    });
+
+    await loadAll();
+    alert("Order status updated.");
+  } catch (error) {
+    alert("Status update failed: " + error.message);
+  }
+}
+</script>
+
+</body>
+</html>
