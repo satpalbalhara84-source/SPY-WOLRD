@@ -240,9 +240,12 @@ a{color:var(--teal)}
         </div>
 
         <div class="field" style="grid-column:1/-1">
-          <label>Image URL (optional)</label>
-          <input id="pImage" type="url"
-            placeholder="https://example.com/product.jpg">
+          <label>Product Photo — Gallery se select karein</label>
+          <input id="pImageFile" type="file" accept="image/*">
+          <p class="hint">JPG, PNG ya WebP photo select karein. Photo Supabase Storage par upload hogi.</p>
+          <img id="imagePreview" class="hidden" alt="Product photo preview"
+            style="max-width:180px;max-height:180px;object-fit:contain;border:1px solid var(--line);border-radius:10px;padding:5px">
+          <input id="pImage" type="hidden">
         </div>
 
         <div class="field" style="grid-column:1/-1">
@@ -553,6 +556,8 @@ function editProduct(id) {
   $("pOldPrice").value = p.old_price ?? "";
   $("pTag").value = p.tag || "";
   $("pImage").value = p.image_url || "";
+  $("pImageFile").value = "";
+  showImagePreview(p.image_url || "");
   $("pDescription").value = p.description || "";
   $("pActive").value = String(p.active);
 
@@ -567,9 +572,66 @@ function resetProduct() {
   $("pOldPrice").value = "";
   $("pTag").value = "";
   $("pImage").value = "";
+  $("pImageFile").value = "";
+  showImagePreview("");
   $("pDescription").value = "";
   $("pActive").value = "true";
   setMessage("productMessage", "");
+}
+
+function showImagePreview(url) {
+  const img = $("imagePreview");
+  if (url) {
+    img.src = url;
+    img.classList.remove("hidden");
+  } else {
+    img.removeAttribute("src");
+    img.classList.add("hidden");
+  }
+}
+
+$("pImageFile").addEventListener("change", () => {
+  const file = $("pImageFile").files[0];
+  if (file) {
+    if (!file.type.startsWith("image/")) {
+      setMessage("productMessage", "Please select an image file.");
+      $("pImageFile").value = "";
+      return;
+    }
+    if (file.size > 5 * 1024 * 1024) {
+      setMessage("productMessage", "Photo 5 MB se chhoti honi chahiye.");
+      $("pImageFile").value = "";
+      return;
+    }
+    showImagePreview(URL.createObjectURL(file));
+    setMessage("productMessage", "Photo selected. Save Product dabane par upload hogi.");
+  }
+});
+
+async function uploadProductImage(file) {
+  if (!file) return $("pImage").value.trim() || null;
+  if (!file.type.startsWith("image/")) throw new Error("Please select a valid image.");
+  if (file.size > 5 * 1024 * 1024) throw new Error("Photo 5 MB se chhoti honi chahiye.");
+
+  const extension = (file.name.split(".").pop() || "jpg").toLowerCase().replace(/[^a-z0-9]/g, "") || "jpg";
+  const fileName = Date.now() + "-" + Math.random().toString(36).slice(2, 10) + "." + extension;
+  const uploadUrl = BASE_URL + "/storage/v1/object/product-images/" + fileName;
+  const response = await fetch(uploadUrl, {
+    method: "POST",
+    headers: {
+      "apikey": PUBLIC_KEY,
+      "Authorization": "Bearer " + ACCESS_TOKEN,
+      "Content-Type": file.type,
+      "x-upsert": "true"
+    },
+    body: file
+  });
+  if (!response.ok) {
+    let detail = "Upload failed: " + response.status;
+    try { const data = await response.json(); detail = data.message || data.error || detail; } catch (e) {}
+    throw new Error(detail + ". Supabase Storage bucket/policies check karein.");
+  }
+  return BASE_URL + "/storage/v1/object/public/product-images/" + fileName;
 }
 
 async function saveProduct() {
@@ -577,7 +639,8 @@ async function saveProduct() {
   const price = Number($("pPrice").value);
   const oldText = $("pOldPrice").value.trim();
   const oldPrice = oldText === "" ? null : Number(oldText);
-  const imageUrl = $("pImage").value.trim();
+  const selectedImage = $("pImageFile").files[0];
+  const existingImageUrl = $("pImage").value.trim();
 
   if (!name || $("pPrice").value === "" ||
       !Number.isFinite(price) || price < 0) {
@@ -592,24 +655,22 @@ async function saveProduct() {
     return;
   }
 
-  if (imageUrl && !/^https?:\/\//i.test(imageUrl)) {
-    setMessage("productMessage",
-      "Image URL must begin with http:// or https://.");
-    return;
-  }
-
   const body = {
     name,
     category: $("pCategory").value,
     price,
     old_price: oldPrice,
     tag: $("pTag").value.trim() || null,
-    image_url: imageUrl || null,
+    image_url: existingImageUrl || null,
     description: $("pDescription").value.trim() || null,
     active: $("pActive").value === "true"
   };
 
   try {
+    if (selectedImage) {
+      setMessage("productMessage", "Photo upload ho rahi hai...");
+      body.image_url = await uploadProductImage(selectedImage);
+    }
     const id = $("productId").value;
 
     if (id) {
