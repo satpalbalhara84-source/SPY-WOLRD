@@ -22,6 +22,25 @@
 .detail-thumbs img.selected{border-color:#f5b400}
 .detail-description{white-space:pre-wrap;line-height:1.6}
 @media(max-width:650px){.details-box{grid-template-columns:1fr;padding:16px}.detail-main-img{height:280px}}
+
+/* Professional Spy World visual refresh */
+:root{--dark:#101c2c;--yellow:#e9a817;--bg:#f1f5f9;--muted:#64748b;--ink:#172334;--line:#e2e8f0;--teal:#0f766e}
+body{background:linear-gradient(180deg,#f8fafc 0%,#eef3f8 100%);color:var(--ink);font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif}
+header{background:rgba(12,27,43,.98);padding:16px max(5%,calc((100% - 1150px)/2));box-shadow:0 8px 26px rgba(15,23,42,.12);border-bottom:1px solid rgba(255,255,255,.08)}
+.logo{letter-spacing:.4px}.logo small{color:#a9bdcf;letter-spacing:3.2px}
+.search{border:1px solid #d8e1eb;outline:none;background:#fff;box-shadow:0 2px 8px rgba(15,23,42,.05)}.search:focus{border-color:#e9a817;box-shadow:0 0 0 3px rgba(233,168,23,.18)}
+.btn{background:linear-gradient(135deg,#f3bd42,#e6a00b);color:#172334;box-shadow:0 4px 12px rgba(233,168,23,.18);transition:transform .18s ease,box-shadow .18s ease}.btn:hover{transform:translateY(-1px);box-shadow:0 7px 18px rgba(15,23,42,.16)}.darkbtn{background:#14263a;color:#fff;box-shadow:none}.darkbtn:hover{background:#203d58}
+.header-banner{background:#0b1827}.header-banner img{max-height:540px;object-fit:cover}
+main{padding-top:30px}h2{letter-spacing:-.35px;color:#14263a}
+.hero{position:relative;overflow:hidden;background:radial-gradient(circle at 90% 10%,rgba(36,112,132,.45),transparent 34%),linear-gradient(120deg,#101c2c 0%,#18364d 60%,#0f5260 100%);border:1px solid rgba(255,255,255,.1);border-radius:22px;padding:clamp(28px,5vw,52px);box-shadow:0 18px 40px rgba(15,35,55,.14)}.hero:after{content:"";position:absolute;width:260px;height:260px;border:1px solid rgba(255,255,255,.09);border-radius:50%;right:-70px;bottom:-130px;box-shadow:0 0 0 28px rgba(255,255,255,.025),0 0 0 58px rgba(255,255,255,.02);pointer-events:none}.hero h1{letter-spacing:-1.5px;line-height:1.05}.hero p{color:#d6e2ec}
+#catalogue{margin-top:30px}.filters{gap:9px}.filter{background:#fff;color:#405166;border-color:#dce4ed;transition:all .15s ease}.filter:hover{border-color:#b8c8d8}.filter.active{background:#14263a;border-color:#14263a;color:#fff;box-shadow:0 4px 12px rgba(20,38,58,.16)}
+.grid{gap:18px}.card{background:#fff;border:1px solid #e0e7ef;border-radius:16px;box-shadow:0 4px 14px rgba(15,23,42,.035);transition:transform .2s ease,box-shadow .2s ease,border-color .2s ease}.card:hover{transform:translateY(-4px);box-shadow:0 14px 30px rgba(15,23,42,.10);border-color:#cbd8e5}.art{height:185px;background:linear-gradient(145deg,#f8fafc,#e7eef5);padding:8px}.art img{border-radius:9px;transition:transform .25s ease}.art img:hover{transform:scale(1.035)}.info{padding:16px}.info h3{color:#172b40;line-height:1.35}.desc{color:#718096;line-height:1.55}.price{color:#0f766e;letter-spacing:-.3px}.card button{border-radius:8px}
+.panel{background:#fff;border:1px solid #e1e8f0;border-radius:17px;box-shadow:0 8px 24px rgba(15,23,42,.045);padding:clamp(16px,3vw,25px)}.panel input,.panel textarea{border-color:#d7e0e9;background:#fbfdff;outline:none}.panel input:focus,.panel textarea:focus{border-color:#0f766e;box-shadow:0 0 0 3px rgba(15,118,110,.10)}.cartrow{gap:12px;border-color:#e8edf3}.muted{color:#718096}
+footer{background:#0b1726;border-top:3px solid #e9a817;color:#d7e1eb}footer .muted{color:#9eafc1}
+.image-modal{backdrop-filter:blur(5px)}
+@media(max-width:850px){.art{height:160px}.grid{gap:12px}}
+@media(max-width:430px){header{padding:14px 4%;gap:12px}.logo{font-size:20px}.search{min-width:140px}.art{height:130px}.info{padding:11px}.hero{border-radius:16px}.hero h1{letter-spacing:-.8px}}
+
 </style></head><body>
 <header><a class="logo" href="#" style="color:white;text-decoration:none">◉ SPY WORLD<small>SMART CAMERA STORE</small></a><input class="search" id="search" placeholder="Search products..." oninput="render()"><button class="btn" onclick="document.getElementById('checkout').scrollIntoView({behavior:'smooth'})">Cart (<span id="count">0</span>)</button></header>
 <section class="header-banner" aria-label="Spy World spy camera banner"><img src="spy-world-header.png" alt="Spy World spy camera and hidden camera collection"></section>
