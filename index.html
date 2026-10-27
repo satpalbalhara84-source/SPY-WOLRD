@@ -9,6 +9,19 @@
 .image-modal img{display:block;max-width:95vw;max-height:88vh;width:auto;height:auto;object-fit:contain;border-radius:10px;box-shadow:0 10px 45px rgba(0,0,0,.45);cursor:default}
 .image-modal .close{position:absolute;top:14px;right:18px;width:44px;height:44px;border:0;border-radius:50%;background:#fff;color:#111;font-size:30px;line-height:1;cursor:pointer}
 .zoom-hint{font-size:11px;color:#667085;margin-top:6px}
+
+/* Product details and multi-photo gallery */
+.card{cursor:pointer}
+.details-modal{display:none;position:fixed;inset:0;z-index:99990;background:rgba(3,10,18,.82);overflow:auto;padding:20px}
+.details-modal.open{display:flex;align-items:center;justify-content:center}
+.details-box{position:relative;background:#fff;color:#111827;width:min(900px,100%);max-height:94vh;overflow:auto;border-radius:16px;padding:22px;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:22px}
+.details-close{position:absolute;right:12px;top:10px;border:0;border-radius:50%;width:38px;height:38px;font-size:24px;cursor:pointer;background:#edf0f4;z-index:2}
+.detail-main-img{width:100%;height:360px;object-fit:contain;background:#f2f4f7;border-radius:12px;cursor:zoom-in}
+.detail-thumbs{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+.detail-thumbs img{width:65px;height:65px;object-fit:cover;border:2px solid #e0e4ea;border-radius:8px;cursor:pointer}
+.detail-thumbs img.selected{border-color:#f5b400}
+.detail-description{white-space:pre-wrap;line-height:1.6}
+@media(max-width:650px){.details-box{grid-template-columns:1fr;padding:16px}.detail-main-img{height:280px}}
 </style></head><body>
 <header><a class="logo" href="#" style="color:white;text-decoration:none">◉ SPY WORLD<small>SMART CAMERA STORE</small></a><input class="search" id="search" placeholder="Search products..." oninput="render()"><button class="btn" onclick="document.getElementById('checkout').scrollIntoView({behavior:'smooth'})">Cart (<span id="count">0</span>)</button></header>
 <section class="header-banner" aria-label="Spy World spy camera banner"><img src="spy-world-header.png" alt="Spy World spy camera and hidden camera collection"></section>
@@ -23,6 +36,25 @@
   <img id="largeProductImage" src="" alt="Enlarged product" onclick="event.stopPropagation()">
 </div>
 
+<div id="detailsModal" class="details-modal" role="dialog" aria-modal="true" aria-label="Product details" onclick="closeDetails(event)">
+  <section class="details-box" onclick="event.stopPropagation()">
+    <button class="details-close" type="button" aria-label="Close details" onclick="closeDetails()">×</button>
+    <div>
+      <img id="detailMainImage" class="detail-main-img" alt="Product image" onclick="openImage(this.src,this.alt)">
+      <div id="detailThumbs" class="detail-thumbs"></div>
+    </div>
+    <div style="padding-top:28px">
+      <div id="detailCategory" class="muted"></div>
+      <h2 id="detailName"></h2>
+      <div id="detailPrice" class="price"></div>
+      <div id="detailOldPrice" class="muted"></div>
+      <p id="detailTag" class="muted"></p>
+      <div id="detailDescription" class="detail-description"></div>
+      <p id="detailStock" class="muted"></p>
+      <button id="detailAddButton" class="btn darkbtn" type="button">ADD TO CART</button>
+    </div>
+  </section>
+</div>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
 // STEP 1: Supabase Project URL and publishable key
@@ -34,16 +66,57 @@ const money=n=>"₹"+Number(n).toLocaleString("en-IN");
 function configured(){return SUPABASE_URL.startsWith("https://")&&!SUPABASE_URL.includes("PASTE_")&&SUPABASE_ANON_KEY.length>20&&!SUPABASE_ANON_KEY.includes("PASTE_")}
 async function init(){if(!configured()){document.getElementById("status").textContent="Setup required: add your Supabase URL and publishable/anon key in this HTML file.";return}
  db=window.supabase.createClient(SUPABASE_URL,SUPABASE_ANON_KEY);
- const {data,error}=await db.from("products").select("id,name,category,description,price,image_url,active,created_at").eq("active",true).order("created_at",{ascending:false});
+ const {data,error}=await db.from("products").select("id,name,category,description,price,old_price,tag,image_url,image_urls,active,created_at").eq("active",true).order("created_at",{ascending:false});
  if(error){document.getElementById("status").textContent="Could not load products: "+error.message;console.error("Product query failed:",error);return}
  products=data||[];document.getElementById("status").textContent=products.length+" products available • Prices shown in INR";renderFilters();render()}
 function renderFilters(){const cats=["All",...new Set(products.map(p=>p.category))];document.getElementById("filters").innerHTML=cats.map(c=>`<button class="filter ${c===category?"active":""}" onclick="category=${JSON.stringify(c)};renderFilters();render()">${esc(c)}</button>`).join("")}
 function esc(s){return String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]))}
-function render(){const q=(document.getElementById("search").value||"").toLowerCase();const list=products.filter(p=>(category==="All"||p.category===category)&&((p.name||"")+" "+(p.description||"")+" "+(p.category||"")).toLowerCase().includes(q));
- document.getElementById("products").innerHTML=list.map(p=>`<article class="card"><div class="art">${p.image_url?`<img src="${esc(p.image_url)}" alt="${esc(p.name)}" onclick="openImage(this.src,this.alt)" style="width:100%;height:100%;object-fit:cover">`:"📷"}</div><div class="info"><h3>${esc(p.name)}</h3><div class="desc">${esc(p.description)}</div><div class="price">${money(p.price)}</div><button class="btn darkbtn" onclick="add('${p.id}')">ADD TO CART</button></div></article>`).join("")||"<p>No products found.</p>";drawCart()}
-function openImage(src, alt){const modal=document.getElementById("imageModal");const image=document.getElementById("largeProductImage");image.src=src;image.alt=alt||"Enlarged product";modal.classList.add("open");document.body.style.overflow="hidden"}
-function closeImage(e){if(e){e.stopPropagation();if(e.target&&e.target.id==="largeProductImage")return}document.getElementById("imageModal").classList.remove("open");document.getElementById("largeProductImage").src="";document.body.style.overflow=""}
-document.addEventListener("keydown",e=>{if(e.key==="Escape")closeImage()});
+function productImages(p){
+  const list = Array.isArray(p.image_urls) ? p.image_urls.filter(Boolean) : [];
+  if (p.image_url && !list.includes(p.image_url)) list.unshift(p.image_url);
+  return list.slice(0,5);
+}
+function render(){
+ const q=(document.getElementById("search").value||"").toLowerCase();
+ const list=products.filter(p=>(category==="All"||p.category===category)&&((p.name||"")+" "+(p.description||"")+" "+(p.category||"")).toLowerCase().includes(q));
+ document.getElementById("products").innerHTML=list.map(p=>{
+   const imgs=productImages(p), cover=imgs[0];
+   return `<article class="card" onclick="showDetails('${p.id}')">
+     <div class="art">${cover?`<img src="${esc(cover)}" alt="${esc(p.name)}" style="width:100%;height:100%;object-fit:cover" loading="lazy">`:"📷"}</div>
+     <div class="info"><h3>${esc(p.name)}</h3><div class="desc">${esc(p.description||"")}</div><div class="price">${money(p.price)}</div><button class="btn darkbtn" onclick="event.stopPropagation();add('${p.id}')">ADD TO CART</button><div class="zoom-hint">Click product for full details${imgs.length>1?" • "+imgs.length+" photos":""}</div></div>
+   </article>`;
+ }).join("")||"<p>No products found.</p>";
+ drawCart();
+}
+function showDetails(id){
+ const p=products.find(x=>String(x.id)===String(id)); if(!p)return;
+ const imgs=productImages(p);
+ document.getElementById("detailName").textContent=p.name||"Product";
+ document.getElementById("detailCategory").textContent=p.category||"";
+ document.getElementById("detailPrice").textContent=money(p.price);
+ document.getElementById("detailOldPrice").textContent=p.old_price?("Old price: "+money(p.old_price)):"";
+ document.getElementById("detailTag").textContent=p.tag||"";
+ document.getElementById("detailDescription").textContent=p.description||"No product description available.";
+ document.getElementById("detailStock").textContent="";
+ document.getElementById("detailAddButton").onclick=()=>add(p.id);
+ const main=document.getElementById("detailMainImage");
+ main.src=imgs[0]||""; main.style.display=imgs.length?"block":"none";
+ document.getElementById("detailThumbs").innerHTML=imgs.map((url,i)=>
+   `<img src="${esc(url)}" alt="${esc(p.name)} photo ${i+1}" class="${i===0?"selected":""}" onclick="selectDetailImage(this,'${esc(url)}')">`
+ ).join("");
+ document.getElementById("detailsModal").classList.add("open");
+ document.body.style.overflow="hidden";
+}
+function selectDetailImage(el,url){
+ document.getElementById("detailMainImage").src=url;
+ document.querySelectorAll("#detailThumbs img").forEach(img=>img.classList.remove("selected"));
+ el.classList.add("selected");
+}
+function closeDetails(e){
+ if(e)e.stopPropagation();
+ document.getElementById("detailsModal").classList.remove("open");
+ if(!document.getElementById("imageModal").classList.contains("open"))document.body.style.overflow="";
+}
 function add(id){cart[id]=(cart[id]||0)+1;drawCart()}
 function qty(id,d){cart[id]=(cart[id]||0)+d;if(cart[id]<=0)delete cart[id];drawCart()}
 function drawCart(){let items=products.filter(p=>cart[p.id]);document.getElementById("count").textContent=items.reduce((s,p)=>s+cart[p.id],0);document.getElementById("cart").innerHTML=items.length?items.map(p=>`<div class="cartrow"><div><b>${esc(p.name)}</b><div class="muted">${money(p.price)} each</div></div><div><button type="button" onclick="qty('${p.id}',-1)">−</button> ${cart[p.id]} <button type="button" onclick="qty('${p.id}',1)">+</button></div><b>${money(p.price*cart[p.id])}</b></div>`).join(""):"<p class='muted'>Your cart is empty.</p>";document.getElementById("total").textContent="Total: "+money(items.reduce((s,p)=>s+p.price*cart[p.id],0))}
