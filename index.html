@@ -4,15 +4,16 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#071522">
 <title>Spy World | Spy Camera Store</title>
-<meta name="description" content="Shop mini spy cameras, button cameras, WiFi cameras and security accessories at Spy World.">
+<meta name="description" content="Shop mini cameras, WiFi cameras and security accessories at Spy World.">
 
 <style>
 :root {
   --bg:#071522;
   --card:#102638;
   --teal:#17d6c1;
-  --white:#f4f8fb;
+  --text:#f4f8fb;
   --muted:#a9bac8;
   --line:#244255;
 }
@@ -21,7 +22,7 @@ body {
   margin:0;
   font-family:Arial,sans-serif;
   background:var(--bg);
-  color:var(--white);
+  color:var(--text);
 }
 a { text-decoration:none; color:inherit; }
 button,input,select { font:inherit; }
@@ -46,7 +47,7 @@ header {
   align-items:center;
   justify-content:space-between;
   gap:12px;
-  min-height:75px;
+  min-height:72px;
 }
 .logo {
   font-size:24px;
@@ -62,6 +63,7 @@ header {
   font-weight:bold;
   cursor:pointer;
 }
+.btn:disabled { opacity:.6; cursor:wait; }
 .primary { background:var(--teal); color:#04151c; }
 .secondary {
   background:#142e40;
@@ -76,7 +78,7 @@ header {
 }
 
 .hero {
-  padding:60px 0 45px;
+  padding:55px 0 40px;
   background:radial-gradient(ellipse at 85% 30%,#10465a,#071522 60%);
 }
 .heroGrid {
@@ -102,12 +104,7 @@ h1 span { color:var(--teal); }
   line-height:1.8;
   font-size:17px;
 }
-.actions {
-  display:flex;
-  gap:12px;
-  flex-wrap:wrap;
-  margin-top:24px;
-}
+.actions { display:flex; gap:12px; flex-wrap:wrap; margin-top:24px; }
 .cameraArt {
   height:300px;
   border:1px solid #245063;
@@ -124,7 +121,6 @@ h1 span { color:var(--teal); }
   background:radial-gradient(circle at 35% 30%,#7bf9e9,#167e9b 15%,#02080d 65%);
   box-shadow:0 0 60px #17d6c155;
 }
-
 .features {
   display:grid;
   grid-template-columns:repeat(3,1fr);
@@ -159,7 +155,7 @@ h1 span { color:var(--teal); }
 
 .products {
   display:grid;
-  grid-template-columns:repeat(4,1fr);
+  grid-template-columns:repeat(4,minmax(0,1fr));
   gap:16px;
 }
 .product {
@@ -169,19 +165,20 @@ h1 span { color:var(--teal); }
   background:linear-gradient(#102638,#0b1c2a);
   border:1px solid var(--line);
   border-radius:17px;
-  transition:.2s;
-}
-.product:hover {
-  transform:translateY(-4px);
-  border-color:var(--teal);
 }
 .productImage {
   height:180px;
   display:grid;
   place-items:center;
   background:radial-gradient(circle,#19485a,#091824 70%);
-  font-size:65px;
+  font-size:60px;
   position:relative;
+  overflow:hidden;
+}
+.productImage img {
+  width:100%;
+  height:100%;
+  object-fit:contain;
 }
 .tag {
   position:absolute;
@@ -192,6 +189,7 @@ h1 span { color:var(--teal); }
   font-size:11px;
   background:#17404d;
   color:#86f8e8;
+  z-index:1;
 }
 .productBody {
   padding:16px;
@@ -211,6 +209,7 @@ h1 span { color:var(--teal); }
   gap:10px;
   align-items:center;
   margin:16px 0;
+  flex-wrap:wrap;
 }
 .price { font-size:22px; font-weight:900; }
 .old {
@@ -227,7 +226,6 @@ h1 span { color:var(--teal); }
   color:var(--muted);
   border-radius:12px;
 }
-
 footer {
   border-top:1px solid var(--line);
   padding:30px 0;
@@ -266,6 +264,7 @@ footer {
   display:flex;
   justify-content:space-between;
   align-items:center;
+  gap:10px;
 }
 .close {
   background:#193345;
@@ -292,6 +291,7 @@ footer {
   border:1px solid var(--line);
   padding:5px 9px;
   border-radius:6px;
+  cursor:pointer;
 }
 .total {
   border-top:1px solid var(--line);
@@ -318,10 +318,11 @@ footer {
 }
 .full { width:100%; }
 .small { color:var(--muted); font-size:12px; line-height:1.6; }
+#message { white-space:pre-wrap; overflow-wrap:anywhere; }
 
 @media(max-width:850px) {
   .heroGrid { grid-template-columns:1fr; }
-  .products { grid-template-columns:repeat(2,1fr); }
+  .products { grid-template-columns:repeat(2,minmax(0,1fr)); }
   .features { grid-template-columns:1fr; }
 }
 @media(max-width:500px) {
@@ -336,7 +337,6 @@ footer {
 </head>
 
 <body>
-
 <div class="top">
   Spy Camera & Security Products |
   Call / WhatsApp: +91 72063 52583
@@ -371,9 +371,7 @@ footer {
            target="_blank" rel="noopener">WhatsApp Us</a>
       </div>
     </div>
-    <div class="cameraArt">
-      <div class="lens"></div>
-    </div>
+    <div class="cameraArt"><div class="lens"></div></div>
   </div>
 </section>
 
@@ -381,15 +379,15 @@ footer {
   <div class="features">
     <div class="feature">
       <strong>◈ Selected Products</strong>
-      <p>Explore compact cameras and useful security accessories.</p>
+      <p>Explore compact cameras and security accessories.</p>
     </div>
     <div class="feature">
       <strong>▣ Easy Ordering</strong>
-      <p>Add products to your cart and submit an order request.</p>
+      <p>Add products to your cart and place an order request.</p>
     </div>
     <div class="feature">
       <strong>✆ Customer Support</strong>
-      <p>Contact us on WhatsApp for availability and product details.</p>
+      <p>Contact us on WhatsApp for product and delivery details.</p>
     </div>
   </div>
 </div>
@@ -402,8 +400,8 @@ footer {
 
     <div class="tools">
       <input id="search" type="search"
-             placeholder="Search products..."
-             oninput="renderProducts()">
+        placeholder="Search products..."
+        oninput="renderProducts()">
       <select id="category" onchange="renderProducts()">
         <option value="all">All Categories</option>
         <option value="Mini Camera">Mini Camera</option>
@@ -416,9 +414,8 @@ footer {
     <div class="products" id="productGrid"></div>
 
     <p class="small">
-      Sample listings and prices are for demonstration only.
-      Confirm stock, price and specifications before ordering.
-      Use cameras lawfully and with appropriate consent.
+      Confirm product stock, price and specifications before ordering.
+      Use cameras only lawfully and with appropriate consent.
     </p>
   </div>
 </section>
@@ -433,19 +430,16 @@ footer {
     <div>
       <strong>Contact Us</strong>
       <p>Phone / WhatsApp: +91 72063 52583</p>
-      <a href="https://wa.me/917206352583" target="_blank" rel="noopener">
-        Chat with us ↗
-      </a>
+      <a href="https://wa.me/917206352583"
+         target="_blank" rel="noopener">Chat with us ↗</a>
     </div>
   </div>
-  <div class="wrap">
-    © <span id="year"></span> Spy World. All rights reserved.
-  </div>
+  <div class="wrap">© <span id="year"></span> Spy World.</div>
 </footer>
 
-<!-- CART WINDOW -->
+<!-- CART -->
 <div class="modalBack" id="cartModal"
-     onclick="backdropClose(event,'cartModal')">
+  onclick="backdropClose(event,'cartModal')">
   <div class="modal">
     <div class="modalHead">
       <h2>Your Cart</h2>
@@ -455,9 +449,9 @@ footer {
   </div>
 </div>
 
-<!-- CHECKOUT WINDOW -->
+<!-- CHECKOUT -->
 <div class="modalBack" id="checkoutModal"
-     onclick="backdropClose(event,'checkoutModal')">
+  onclick="backdropClose(event,'checkoutModal')">
   <div class="modal">
     <div class="modalHead">
       <h2>Place Your Order</h2>
@@ -467,15 +461,17 @@ footer {
     <form id="checkoutForm">
       <div class="field">
         <label for="custName">Full Name *</label>
-        <input id="custName" required maxlength="100">
+        <input id="custName" required maxlength="100" autocomplete="name">
       </div>
       <div class="field">
         <label for="custPhone">Mobile Number *</label>
-        <input id="custPhone" required inputmode="tel" maxlength="15">
+        <input id="custPhone" required inputmode="tel"
+          maxlength="20" autocomplete="tel">
       </div>
       <div class="field">
         <label for="custAddress">Delivery Address *</label>
-        <input id="custAddress" required maxlength="300">
+        <input id="custAddress" required maxlength="300"
+          autocomplete="street-address">
       </div>
       <div class="field">
         <label for="custCity">City *</label>
@@ -490,30 +486,48 @@ footer {
         <input id="custNotes" maxlength="300">
       </div>
 
+      <p id="message" class="small"></p>
+
       <p class="small">
-        Your order request will open in WhatsApp.
-        The store will confirm product availability, delivery and payment.
+        Your order will first be saved to the store database.
+        WhatsApp will open after successful saving.
       </p>
 
-      <button class="btn primary full" type="submit">
-        Send Order on WhatsApp
+      <button class="btn primary full" id="submitOrder" type="submit">
+        Save Order & Continue to WhatsApp
       </button>
     </form>
   </div>
 </div>
 
 <script>
-const WHATSAPP_NUMBER = "917206352583";
+/* =====================================================
+   SPY WORLD CONFIGURATION
+   ===================================================== */
 
 const SUPABASE_URL =
   "https://hlevuiqokhckksoqxrod.supabase.co";
 
+/*
+  IMPORTANT:
+  Paste your NEW project's sb_publishable_... key below.
+  Never use a service_role or secret key in this file.
+*/
 const SUPABASE_ANON_KEY =
   "sb_publishable_cGB0SbK0qG16zl14eYQTDw_9CcguPS_";
 
+const ORDER_FUNCTION_URL =
+  SUPABASE_URL + "/functions/v1/place-order";
+
+const WHATSAPP_NUMBER = "917206352583";
+
+/* =====================================================
+   PRODUCTS AND CART
+   ===================================================== */
+
 const sampleProducts = [
   {
-    id:"p1",
+    id:"demo-1",
     name:"Mini WiFi Camera",
     category:"WiFi Camera",
     price:1499,
@@ -523,17 +537,17 @@ const sampleProducts = [
     description:"Compact camera. Confirm specifications before ordering."
   },
   {
-    id:"p2",
+    id:"demo-2",
     name:"Button Style Camera",
     category:"Button Camera",
     price:999,
     old_price:1299,
     tag:"COMPACT",
     icon:"●",
-    description:"Small-format camera. Features subject to confirmation."
+    description:"Button-style camera. Confirm product specifications."
   },
   {
-    id:"p3",
+    id:"demo-3",
     name:"Mini Portable Camera",
     category:"Mini Camera",
     price:799,
@@ -543,23 +557,23 @@ const sampleProducts = [
     description:"Portable camera for lawful, consent-based monitoring."
   },
   {
-    id:"p4",
+    id:"demo-4",
     name:"Camera Accessories Kit",
     category:"Accessories",
     price:399,
     old_price:499,
     tag:"ACCESSORY",
     icon:"▣",
-    description:"Ask us to confirm compatibility with your device."
+    description:"Check device compatibility before ordering."
   }
 ];
 
 let products = [...sampleProducts];
-
 let cart = [];
+
 try {
-  cart = JSON.parse(localStorage.getItem("spyworld_cart") || "[]");
-  if (!Array.isArray(cart)) cart = [];
+  const saved = JSON.parse(localStorage.getItem("spyworld_cart") || "[]");
+  if (Array.isArray(saved)) cart = saved;
 } catch (e) {
   cart = [];
 }
@@ -588,13 +602,16 @@ function updateCount() {
 }
 
 function renderProducts() {
-  const q = document.getElementById("search").value.toLowerCase();
-  const category = document.getElementById("category").value;
+  const query =
+    document.getElementById("search").value.toLowerCase();
+
+  const category =
+    document.getElementById("category").value;
 
   const list = products.filter(p =>
     (category === "all" || p.category === category) &&
-    (p.name + " " + p.category + " " + p.description)
-      .toLowerCase().includes(q)
+    (p.name + " " + p.category + " " + (p.description || ""))
+      .toLowerCase().includes(query)
   );
 
   const grid = document.getElementById("productGrid");
@@ -608,12 +625,16 @@ function renderProducts() {
   grid.innerHTML = list.map(p => `
     <article class="product">
       <div class="productImage">
-        <span class="tag">${escapeHTML(p.tag)}</span>
-        ${escapeHTML(p.icon)}
+        <span class="tag">${escapeHTML(p.tag || p.category)}</span>
+        ${p.image_url
+          ? `<img src="${escapeHTML(p.image_url)}"
+               alt="${escapeHTML(p.name)}"
+               onerror="this.remove()">`
+          : escapeHTML(p.icon || "◉")}
       </div>
       <div class="productBody">
         <h3>${escapeHTML(p.name)}</h3>
-        <div class="desc">${escapeHTML(p.description)}</div>
+        <div class="desc">${escapeHTML(p.description || "")}</div>
         <div class="priceRow">
           <span class="price">${money(p.price)}</span>
           ${p.old_price
@@ -621,7 +642,7 @@ function renderProducts() {
             : ""}
         </div>
         <button class="btn primary"
-          onclick="addToCart('${p.id}')">
+          onclick="addToCart('${escapeHTML(p.id)}')">
           Add to Cart +
         </button>
       </div>
@@ -629,11 +650,65 @@ function renderProducts() {
   `).join("");
 }
 
+/* Load live products.
+   Sample products are used only if database loading fails
+   or the table has no active products. Sample products
+   cannot be ordered successfully unless matching live
+   products exist in Supabase.
+*/
+async function loadProducts() {
+  if (
+    !SUPABASE_ANON_KEY ||
+    SUPABASE_ANON_KEY.includes("PASTE_YOUR")
+  ) {
+    renderProducts();
+    return;
+  }
+
+  try {
+    const response = await fetch(
+      SUPABASE_URL +
+      "/rest/v1/products?select=id,name,category,price,old_price,description,image_url,tag,active&active=eq.true&order=name.asc",
+      {
+        headers: {
+          "apikey": SUPABASE_ANON_KEY,
+          "Authorization": "Bearer " + SUPABASE_ANON_KEY
+        }
+      }
+    );
+
+    if (!response.ok) {
+      throw new Error("Products could not be loaded");
+    }
+
+    const data = await response.json();
+
+    if (data.length) {
+      products = data.map(p => ({
+        ...p,
+        price: Number(p.price),
+        icon: ({
+          "Mini Camera":"◈",
+          "WiFi Camera":"◉",
+          "Button Camera":"●",
+          "Accessories":"▣"
+        })[p.category] || "◉"
+      }));
+    } else {
+      products = [];
+    }
+  } catch (error) {
+    console.error("Product loading error:", error);
+  }
+
+  renderProducts();
+}
+
 function addToCart(id) {
-  const product = products.find(p => p.id === id);
+  const product = products.find(p => String(p.id) === String(id));
   if (!product) return;
 
-  const existing = cart.find(item => item.id === id);
+  const existing = cart.find(p => String(p.id) === String(id));
 
   if (existing) {
     existing.qty++;
@@ -664,13 +739,13 @@ function backdropClose(event, id) {
 }
 
 function changeQty(id, delta) {
-  const item = cart.find(p => p.id === id);
+  const item = cart.find(p => String(p.id) === String(id));
   if (!item) return;
 
   item.qty += delta;
 
   if (item.qty <= 0) {
-    cart = cart.filter(p => p.id !== id);
+    cart = cart.filter(p => String(p.id) !== String(id));
   }
 
   saveCart();
@@ -705,9 +780,9 @@ function renderCart() {
             <div class="small">${money(item.price)} each</div>
           </div>
           <div class="qty">
-            <button onclick="changeQty('${item.id}',-1)">−</button>
+            <button onclick="changeQty('${escapeHTML(item.id)}',-1)">−</button>
             <strong>${item.qty}</strong>
-            <button onclick="changeQty('${item.id}',1)">+</button>
+            <button onclick="changeQty('${escapeHTML(item.id)}',1)">+</button>
           </div>
           <strong>${money(item.price * item.qty)}</strong>
         </div>
@@ -727,75 +802,162 @@ function renderCart() {
 
 function startCheckout() {
   if (!cart.length) return;
-
   closeModal("cartModal");
+  document.getElementById("message").textContent = "";
   document.getElementById("checkoutModal").classList.add("show");
 }
 
+/* =====================================================
+   SAVE ORDER VIA EDGE FUNCTION
+   ===================================================== */
+
 document.getElementById("checkoutForm").addEventListener(
   "submit",
-  function(event) {
+  async function(event) {
     event.preventDefault();
 
+    const button = document.getElementById("submitOrder");
+    const message = document.getElementById("message");
+
     if (!cart.length) {
-      alert("Your cart is empty.");
+      message.textContent = "Your cart is empty.";
       return;
     }
 
-    const name =
-      document.getElementById("custName").value.trim();
+    if (
+      !SUPABASE_ANON_KEY ||
+      SUPABASE_ANON_KEY.includes("PASTE_YOUR")
+    ) {
+      message.textContent =
+        "Please add your NEW Supabase publishable key in index.html.";
+      return;
+    }
 
-    const phone =
-      document.getElementById("custPhone").value.trim();
+    const customer = {
+      customer_name:
+        document.getElementById("custName").value.trim(),
+      phone:
+        document.getElementById("custPhone").value.trim(),
+      address:
+        document.getElementById("custAddress").value.trim(),
+      city:
+        document.getElementById("custCity").value.trim(),
+      pincode:
+        document.getElementById("custPin").value.trim(),
+      notes:
+        document.getElementById("custNotes").value.trim()
+    };
 
-    const address =
-      document.getElementById("custAddress").value.trim();
+    if (
+      !customer.customer_name ||
+      !customer.phone ||
+      !customer.address ||
+      !customer.city
+    ) {
+      message.textContent =
+        "Please complete all required fields.";
+      return;
+    }
 
-    const city =
-      document.getElementById("custCity").value.trim();
+    const items = cart.map(item => ({
+      name:item.name,
+      quantity:item.qty
+    }));
 
-    const pin =
-      document.getElementById("custPin").value.trim();
+    button.disabled = true;
+    button.textContent = "Saving Order...";
+    message.textContent = "Saving your order securely...";
 
-    const notes =
-      document.getElementById("custNotes").value.trim();
+    try {
+      const response = await fetch(ORDER_FUNCTION_URL, {
+        method:"POST",
+        headers:{
+          "Content-Type":"application/json",
+          "apikey":SUPABASE_ANON_KEY
+        },
+        body:JSON.stringify({
+          ...customer,
+          items
+        })
+      });
 
-    const orderRef =
-      "SW" + Date.now().toString().slice(-8);
+      let result = {};
+      try {
+        result = await response.json();
+      } catch (e) {
+        throw new Error("Invalid server response.");
+      }
 
-    const items = cart.map(item =>
-      `${item.name} x ${item.qty} = ${money(item.price * item.qty)}`
-    ).join("\n");
+      if (!response.ok || !result.success || !result.order) {
+        throw new Error(
+          result.error || "The order could not be saved."
+        );
+      }
 
-    const message =
-`Hello Spy World, I want to place an order.
+      const order = result.order;
 
-Order Number: ${orderRef}
+      const orderItems = cart.map(item =>
+        `${item.name} x ${item.qty} = ${money(item.price * item.qty)}`
+      ).join("\n");
 
-${items}
+      const whatsappMessage =
+`Hello Spy World, my order has been saved.
 
-Total: ${money(cartTotal())}
+Order Number: ${order.order_ref}
 
-Name: ${name}
-Mobile: ${phone}
-Address: ${address}
-City: ${city}
-PIN Code: ${pin}
-Notes: ${notes || "-"}
+${orderItems}
 
-Please confirm availability and delivery details.`;
+Verified Order Total: ${money(order.total_amount)}
 
-    const url =
-      "https://wa.me/" + WHATSAPP_NUMBER +
-      "?text=" + encodeURIComponent(message);
+Name: ${customer.customer_name}
+Mobile: ${customer.phone}
+Address: ${customer.address}
+City: ${customer.city}
+PIN Code: ${customer.pincode || "-"}
+Notes: ${customer.notes || "-"}
 
-    window.open(url, "_blank", "noopener");
+Please confirm delivery details.`;
 
-    /*
-      WhatsApp order requests are not automatically saved
-      in the Supabase database by this code.
-      A secure backend is needed for database order saving.
-    */
+      message.textContent =
+        "Order saved successfully! Order No: " + order.order_ref;
+
+      alert(
+        "Order saved successfully!\nOrder Number: " +
+        order.order_ref
+      );
+
+      const whatsappUrl =
+        "https://wa.me/" + WHATSAPP_NUMBER +
+        "?text=" + encodeURIComponent(whatsappMessage);
+
+      window.open(whatsappUrl, "_blank");
+
+      cart = [];
+      saveCart();
+      document.getElementById("checkoutForm").reset();
+
+      setTimeout(() => {
+        closeModal("checkoutModal");
+        renderProducts();
+      }, 1200);
+
+    } catch (error) {
+      console.error("Order submission error:", error);
+
+      message.textContent =
+        "Order save nahi hua: " + error.message +
+        "\nPlease retry. WhatsApp has not been opened.";
+
+      alert(
+        "Order database mein save nahi hua.\n\n" +
+        error.message +
+        "\n\nPlease check the function deployment and try again."
+      );
+
+    } finally {
+      button.disabled = false;
+      button.textContent = "Save Order & Continue to WhatsApp";
+    }
   }
 );
 
@@ -804,6 +966,7 @@ document.getElementById("year").textContent =
 
 updateCount();
 renderProducts();
+loadProducts();
 </script>
 
 </body>
