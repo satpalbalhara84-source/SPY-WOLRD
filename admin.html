@@ -306,6 +306,7 @@ a{color:var(--teal)}
               <th>Total</th>
               <th>Status</th>
               <th>Update</th>
+              <th>Details</th>
             </tr>
           </thead>
           <tbody id="ordersBody"></tbody>
@@ -477,7 +478,7 @@ async function loadAll() {
     );
 
     orderRows = await request(
-      "orders?select=id,order_ref,customer_name,phone,total_amount,status,created_at&order=created_at.desc&limit=200"
+      "orders?select=*&order=created_at.desc&limit=200"
     );
 
     drawProducts();
@@ -521,28 +522,73 @@ function drawProducts() {
     '<tr><td colspan="5">No products found.</td></tr>';
 }
 
+function formatOrderDate(value) {
+  if (!value) return "Not available";
+  const date = new Date(value);
+  return Number.isNaN(date.getTime()) ? safeText(value) : safeText(date.toLocaleString("en-IN"));
+}
+
+function prettyValue(value) {
+  if (value === null || value === undefined || value === "") return "";
+  if (typeof value === "object") return safeText(JSON.stringify(value, null, 2));
+  return safeText(value);
+}
+
+function firstOrderValue(order, keys) {
+  for (const key of keys) {
+    if (order[key] !== undefined && order[key] !== null && order[key] !== "") return order[key];
+  }
+  return null;
+}
+
+function toggleOrderDetails(id) {
+  const row = $("order_details_" + id);
+  if (row) row.classList.toggle("hidden");
+}
+
 function drawOrders() {
-  $("ordersBody").innerHTML = orderRows.map(o => `
+  $("ordersBody").innerHTML = orderRows.map(o => {
+    const detailId = String(o.id);
+    const orderRef = o.order_ref || o.id;
+    const address = firstOrderValue(o, [
+      "shipping_address","customer_address","delivery_address","address","full_address","shippingAddress"
+    ]);
+    const items = firstOrderValue(o, [
+      "items","order_items","products","cart","items_json","order_details"
+    ]);
+    return `
     <tr>
-      <td>${safeText(o.order_ref || o.id)}</td>
-      <td>${safeText(o.customer_name)}</td>
-      <td>${safeText(o.phone)}</td>
+      <td>${safeText(orderRef)}</td>
+      <td>${safeText(o.customer_name || "—")}</td>
+      <td>${safeText(o.phone || "—")}</td>
       <td>${money(o.total_amount)}</td>
-      <td>${safeText(o.status)}</td>
+      <td>${safeText(o.status || "new")}</td>
       <td>
-        <select id="status_${o.id}">
+        <select id="status_${safeText(o.id)}">
           ${["new","confirmed","shipped","completed","cancelled"]
-            .map(s => `<option value="${s}"
-              ${o.status === s ? "selected" : ""}>
-              ${s}
-            </option>`).join("")}
+            .map(s => `<option value="${s}" ${o.status === s ? "selected" : ""}>${s}</option>`).join("")}
         </select>
-        <button class="btn primary"
-          onclick="updateStatus('${o.id}')">Save</button>
+        <button class="btn primary" onclick="updateStatus('${safeText(o.id)}')">Save</button>
       </td>
+      <td><button class="btn secondary" onclick="toggleOrderDetails('${safeText(detailId)}')">View details</button></td>
     </tr>
-  `).join("") ||
-    '<tr><td colspan="6">No orders found.</td></tr>';
+    <tr id="order_details_${safeText(detailId)}" class="hidden">
+      <td colspan="7">
+        <div class="panel" style="margin:8px 0;padding:14px">
+          <h3 style="margin-top:0">Order Details — ${safeText(orderRef)}</h3>
+          <p><strong>Order date:</strong> ${formatOrderDate(o.created_at || o.inserted_at || o.order_date)}</p>
+          <p><strong>Customer address:</strong><br>${address ? prettyValue(address) : "Address field not found in this order."}</p>
+          <p><strong>Products / items:</strong></p>
+          <pre class="message" style="white-space:pre-wrap;overflow-wrap:anywhere;background:#071a27;padding:12px;border-radius:8px">${items ? prettyValue(items) : "Product details field not found in this order."}</pre>
+          <details>
+            <summary style="cursor:pointer;color:var(--teal)">Other saved order fields</summary>
+            <pre class="message" style="white-space:pre-wrap;overflow-wrap:anywhere;background:#071a27;padding:12px;border-radius:8px">${safeText(JSON.stringify(o, null, 2))}</pre>
+          </details>
+        </div>
+      </td>
+    </tr>`;
+  }).join("") ||
+    '<tr><td colspan="7">No orders found.</td></tr>';
 }
 
 function editProduct(id) {
