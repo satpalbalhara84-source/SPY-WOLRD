@@ -627,9 +627,17 @@ async function uploadProductImage(file) {
     body: file
   });
   if (!response.ok) {
-    let detail = "Upload failed: " + response.status;
-    try { const data = await response.json(); detail = data.message || data.error || detail; } catch (e) {}
-    throw new Error(detail + ". Supabase Storage bucket/policies check karein.");
+    let detail = "HTTP " + response.status;
+    try {
+      const data = await response.json();
+      const parts = [data.message, data.error, data.error_description, data.code, data.statusCode, data.hint, data.details]
+        .filter(Boolean).map(v => String(v));
+      if (parts.length) detail += " | " + [...new Set(parts)].join(" | ");
+      else detail += " | " + JSON.stringify(data);
+    } catch (e) {
+      try { detail += " | " + await response.text(); } catch (_) {}
+    }
+    throw new Error("Supabase upload failed: " + detail);
   }
   return BASE_URL + "/storage/v1/object/public/product-images/" + fileName;
 }
