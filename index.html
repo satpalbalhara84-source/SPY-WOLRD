@@ -1,347 +1,42 @@
-
 <!doctype html>
-<html lang="en">
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Spy World | Online Store</title>
 <style>
-:root{--dark:#0b1220;--yellow:#f5b400;--bg:#f4f6fa;--muted:#667085}
-*{box-sizing:border-box}
-body{margin:0;background:var(--bg);color:#111827;font:15px system-ui,Arial}
-header{background:var(--dark);color:white;padding:18px 5%;display:flex;gap:20px;align-items:center;justify-content:space-between;flex-wrap:wrap}
-.logo{font-weight:900;font-size:22px}
-.logo small{display:block;color:#aab4c7;font-size:10px;letter-spacing:3px}
-.search{padding:12px;border-radius:8px;border:0;min-width:220px;flex:1;max-width:500px}
-.btn{border:0;border-radius:9px;background:var(--yellow);padding:12px 16px;font-weight:800;cursor:pointer}
-.darkbtn{background:var(--dark);color:white}
-main{max-width:1150px;margin:auto;padding:22px 18px 50px}
-.hero{background:linear-gradient(120deg,#0b1220,#253d5c);border-radius:18px;color:white;padding:42px 30px;margin-bottom:25px}
-.hero h1{font-size:clamp(32px,5vw,52px);margin:10px 0}
-.hero p{color:#d2d9e4;line-height:1.7;max-width:650px}
-.filters{display:flex;gap:8px;flex-wrap:wrap;margin:15px 0}
-.filter{background:white;border:1px solid #dce1e9;border-radius:30px;padding:9px 14px;cursor:pointer}
-.filter.active{background:var(--dark);color:white}
-.grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:15px}
-.card{background:white;border:1px solid #e3e7ed;border-radius:14px;overflow:hidden}
-.art{height:155px;background:linear-gradient(145deg,#eaf0f7,#d7e0ec);display:grid;place-items:center;font-size:65px}
-.art img{cursor:zoom-in}
-.info{padding:14px}
-.info h3{font-size:16px;margin:0 0 8px}
-.desc{font-size:12px;color:var(--muted);min-height:45px}
-.price{font-size:21px;font-weight:900;margin:10px 0}
-.card button{width:100%}
-.panel{background:white;padding:22px;border-radius:14px;margin-top:25px}
-.panel input,.panel textarea{width:100%;padding:12px;border:1px solid #d0d5dd;border-radius:8px;margin:6px 0 12px}
-.cartrow{display:flex;gap:10px;align-items:center;justify-content:space-between;border-bottom:1px solid #e5e7eb;padding:12px 0}
-.cartrow button{padding:5px 10px}
-.muted{color:var(--muted);font-size:13px}
-footer{background:var(--dark);color:#d1d8e4;padding:28px 5%;line-height:1.7}
-.image-modal{display:none;position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,.9);align-items:center;justify-content:center;padding:22px}
-.image-modal.open{display:flex}
-.image-modal img{max-width:95vw;max-height:88vh;object-fit:contain;border-radius:12px}
-.image-modal .close{position:absolute;top:16px;right:20px;background:#fff;color:#111;border:0;border-radius:50%;width:42px;height:42px;font-size:28px;cursor:pointer}
-.header-banner{width:100%;margin:0 auto;background:#071522;line-height:0}
-.header-banner img{display:block;width:100%;height:auto;max-height:620px;object-fit:cover}
-@media(max-width:850px){.grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
-@media(max-width:430px){.grid{gap:9px}.art{height:120px;font-size:52px}.info{padding:10px}.hero{padding:28px 20px}}
-</style>
-</head>
-<body>
-
-<header>
-<a class="logo" href="#" style="color:white;text-decoration:none">
-◉ SPY WORLD<small>SMART CAMERA STORE</small>
-</a>
-<input class="search" id="search" placeholder="Search products..." oninput="render()">
-<button class="btn" onclick="document.getElementById('checkout').scrollIntoView({behavior:'smooth'})">
-Cart (<span id="count">0</span>)
-</button>
-</header>
-
-<div id="imageModal" class="image-modal" onclick="closeImage(event)" role="dialog" aria-modal="true">
-<button class="close" onclick="closeImage(event)" aria-label="Close">×</button>
-<img id="largeProductImage" src="" alt="Enlarged product image">
-</div>
-
-<section class="header-banner">
-<img src="spy-world-header.png" alt="Spy World Camera Store">
-</section>
-
-<main>
-<section class="hero">
-<div style="color:#f5b400;font-weight:900;letter-spacing:2px">SMART SECURITY • COMPACT CAMERAS</div>
-<h1>Small Cameras.<br>Smart Thinking.</h1>
-<p>Explore compact cameras and Wi-Fi security solutions for lawful, consent-based monitoring at home, in shops and at workplaces.</p>
-<button class="btn" onclick="document.getElementById('catalogue').scrollIntoView({behavior:'smooth'})">SHOP PRODUCTS →</button>
-</section>
-
-<h2 id="catalogue">Shop Cameras</h2>
-<p class="muted" id="status">Connecting to store...</p>
-<div class="filters" id="filters"></div>
-<div class="grid" id="products"></div>
-
-<section class="panel" id="checkout">
-<h2>Your Cart & Checkout</h2>
-<div id="cart"></div>
-<h3 id="total">Total: ₹0</h3>
-
-<form onsubmit="placeOrder(event)">
-<label>Full name</label>
-<input id="name" required minlength="2" maxlength="100">
-
-<label>Mobile number</label>
-<input id="phone" required minlength="7" maxlength="20">
-
-<label>City / PIN code</label>
-<input id="city" required minlength="2" maxlength="120">
-
-<label>Notes (optional)</label>
-<textarea id="notes" maxlength="1000" rows="2"></textarea>
-
-<button class="btn" type="submit">PLACE ORDER</button>
-<button class="btn darkbtn" type="button" onclick="whatsapp()">ORDER VIA WHATSAPP</button>
-</form>
-<p class="muted">Final price, stock, delivery and warranty are subject to seller confirmation. Use cameras only where legally permitted and with appropriate consent.</p>
-</section>
-</main>
-
-<footer>
-<b>SPY WORLD</b><br>
-WhatsApp: +91 72063 52583<br>
-<span class="muted">Online Camera Store</span>
-</footer>
-
+:root{--dark:#0b1220;--yellow:#f5b400;--bg:#f4f6fa;--muted:#667085}*{box-sizing:border-box}body{margin:0;background:var(--bg);color:#111827;font:15px system-ui,Arial}header{background:var(--dark);color:white;padding:18px 5%;display:flex;gap:20px;align-items:center;justify-content:space-between;flex-wrap:wrap}.logo{font-weight:900;font-size:22px}.logo small{display:block;color:#aab4c7;font-size:10px;letter-spacing:3px}.search{padding:12px;border-radius:8px;border:0;min-width:220px;flex:1;max-width:500px}.btn{border:0;border-radius:9px;background:var(--yellow);padding:12px 16px;font-weight:800;cursor:pointer}.darkbtn{background:var(--dark);color:white}.header-banner{width:100%;margin:0 auto;background:#071522;line-height:0}.header-banner img{display:block;width:100%;height:auto;max-height:620px;object-fit:cover}main{max-width:1150px;margin:auto;padding:22px 18px 50px}.hero{background:linear-gradient(120deg,#0b1220,#253d5c);border-radius:18px;color:white;padding:42px 30px;margin-bottom:25px}.hero h1{font-size:clamp(32px,5vw,52px);margin:10px 0}.hero p{color:#d2d9e4;line-height:1.7;max-width:650px}.filters{display:flex;gap:8px;flex-wrap:wrap;margin:15px 0}.filter{background:white;border:1px solid #dce1e9;border-radius:30px;padding:9px 14px;cursor:pointer}.filter.active{background:var(--dark);color:white}.grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:15px}.card{background:white;border:1px solid #e3e7ed;border-radius:14px;overflow:hidden}.art{height:155px;background:linear-gradient(145deg,#eaf0f7,#d7e0ec);display:grid;place-items:center;font-size:65px}.info{padding:14px}.info h3{font-size:16px;margin:0 0 8px}.desc{font-size:12px;color:var(--muted);min-height:45px}.price{font-size:21px;font-weight:900;margin:10px 0}.card button{width:100%}.panel{background:white;padding:22px;border-radius:14px;margin-top:25px}.panel input,.panel textarea{width:100%;padding:12px;border:1px solid #d0d5dd;border-radius:8px;margin:6px 0 12px}.cartrow{display:flex;gap:10px;align-items:center;justify-content:space-between;border-bottom:1px solid #e5e7eb;padding:12px 0}.cartrow button{padding:5px 10px}.muted{color:var(--muted);font-size:13px}footer{background:var(--dark);color:#d1d8e4;padding:28px 5%;line-height:1.7}@media(max-width:850px){.grid{grid-template-columns:repeat(2,minmax(0,1fr))}}@media(max-width:430px){.grid{gap:9px}.art{height:120px;font-size:52px}.info{padding:10px}.hero{padding:28px 20px}}
+</style></head><body>
+<header><a class="logo" href="#" style="color:white;text-decoration:none">◉ SPY WORLD<small>SMART CAMERA STORE</small></a><input class="search" id="search" placeholder="Search products..." oninput="render()"><button class="btn" onclick="document.getElementById('checkout').scrollIntoView({behavior:'smooth'})">Cart (<span id="count">0</span>)</button></header>
+<section class="header-banner" aria-label="Spy World spy camera banner"><img src="spy-world-header.png" alt="Spy World spy camera and hidden camera collection"></section>
+<main><section class="hero"><div style="color:#f5b400;font-weight:900;letter-spacing:2px">SMART SECURITY • COMPACT CAMERAS</div><h1>Small Cameras.<br>Smart Thinking.</h1><p>Explore compact cameras and Wi-Fi security solutions for lawful, consent-based monitoring at home, in shops and at workplaces.</p><button class="btn" onclick="document.getElementById('catalogue').scrollIntoView({behavior:'smooth'})">SHOP PRODUCTS →</button></section>
+<h2 id="catalogue">Shop Cameras</h2><p class="muted" id="status">Connect your Supabase project to load products.</p><div class="filters" id="filters"></div><div class="grid" id="products"></div>
+<section class="panel" id="checkout"><h2>Your Cart & Checkout</h2><div id="cart"></div><h3 id="total">Total: ₹0</h3><form onsubmit="placeOrder(event)"><label>Full name</label><input id="name" required minlength="2" maxlength="100"><label>Mobile number</label><input id="phone" required minlength="7" maxlength="20"><label>City / PIN code</label><input id="city" required minlength="2" maxlength="120"><label>Notes (optional)</label><textarea id="notes" maxlength="1000" rows="2"></textarea><button class="btn" type="submit">PLACE ORDER</button> <button class="btn darkbtn" type="button" onclick="whatsapp()">ORDER VIA WHATSAPP</button></form><p class="muted">Final price, stock, delivery and warranty are subject to seller confirmation. Use cameras only where legally permitted and with appropriate consent.</p></section>
+</main><footer><b>SPY WORLD</b><br>WhatsApp: +91 72063 52583<br><span class="muted">Store starter template. Configure Supabase before using live.</span></footer>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
-// Supabase configuration
+// STEP 1: Replace both placeholders with your own Supabase Project URL and publishable/anon key.
+// Never paste a service_role or secret key into this public website.
 const SUPABASE_URL = "https://hlevuiqokhckksoqxrod.supabase.co";
 const SUPABASE_ANON_KEY = "sb_publishable_cGB0SbK0qG16zl14eYQTDw_9CcguPS_";
 const PHONE = "917206352583";
-
-let db = null;
-let products = [];
-let cart = {};
-let category = "All";
-
-const money = n => "₹" + Number(n || 0).toLocaleString("en-IN");
-
-function esc(s) {
-  return String(s ?? "").replace(/[&<>"']/g, c => ({
-    "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"
-  }[c]));
-}
-
-async function init() {
-  const status = document.getElementById("status");
-
-  try {
-    db = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-
-    const { data, error } = await db
-      .from("products")
-      .select("id,name,slug,category,description,price,compare_at_price,image_url,stock")
-      .eq("is_active", true)
-      .order("created_at", { ascending: false });
-
-    if (error) {
-      status.textContent = "Could not load products: " + error.message;
-      console.error("Supabase products error:", error);
-      return;
-    }
-
-    products = data || [];
-    status.textContent = products.length
-      ? products.length + " products available • Prices shown in INR"
-      : "No active products found. Check your products table and is_active setting.";
-
-    renderFilters();
-    render();
-  } catch (err) {
-    status.textContent = "Connection failed: " + err.message;
-    console.error("Store connection error:", err);
-  }
-}
-
-function renderFilters() {
-  const cats = ["All", ...new Set(products.map(p => p.category).filter(Boolean))];
-
-  document.getElementById("filters").innerHTML = cats.map(c =>
-    `<button class="filter ${c === category ? "active" : ""}"
-    onclick="setCategory(${JSON.stringify(c)})">${esc(c)}</button>`
-  ).join("");
-}
-
-function setCategory(c) {
-  category = c;
-  renderFilters();
-  render();
-}
-
-function render() {
-  const q = (document.getElementById("search").value || "").toLowerCase();
-
-  const list = products.filter(p =>
-    (category === "All" || p.category === category) &&
-    ((p.name || "") + " " + (p.description || "") + " " + (p.category || ""))
-      .toLowerCase().includes(q)
-  );
-
-  document.getElementById("products").innerHTML = list.map(p => `
-    <article class="card">
-      <div class="art">
-        ${p.image_url
-          ? `<img src="${esc(p.image_url)}" alt="${esc(p.name)}"
-              onclick="openImage(this.src,this.alt)"
-              style="width:100%;height:100%;object-fit:cover">`
-          : "📷"}
-      </div>
-      <div class="info">
-        <h3>${esc(p.name)}</h3>
-        <div class="desc">${esc(p.description)}</div>
-        <div class="price">${money(p.price)}</div>
-        <button class="btn darkbtn" onclick="add('${p.id}')">ADD TO CART</button>
-      </div>
-    </article>
-  `).join("") || "<p>No products found.</p>";
-
-  drawCart();
-}
-
-function openImage(src, alt) {
-  document.getElementById("largeProductImage").src = src;
-  document.getElementById("largeProductImage").alt = alt || "Product image";
-  document.getElementById("imageModal").classList.add("open");
-  document.body.style.overflow = "hidden";
-}
-
-function closeImage(e) {
-  if (e) {
-    e.stopPropagation();
-    if (e.target.id === "largeProductImage") return;
-  }
-  document.getElementById("imageModal").classList.remove("open");
-  document.getElementById("largeProductImage").src = "";
-  document.body.style.overflow = "";
-}
-
-document.addEventListener("keydown", e => {
-  if (e.key === "Escape") closeImage();
-});
-
-function add(id) {
-  cart[id] = (cart[id] || 0) + 1;
-  drawCart();
-}
-
-function qty(id, d) {
-  cart[id] = (cart[id] || 0) + d;
-  if (cart[id] <= 0) delete cart[id];
-  drawCart();
-}
-
-function drawCart() {
-  const items = products.filter(p => cart[p.id]);
-
-  document.getElementById("count").textContent =
-    items.reduce((s, p) => s + cart[p.id], 0);
-
-  document.getElementById("cart").innerHTML = items.length
-    ? items.map(p => `
-      <div class="cartrow">
-        <div><b>${esc(p.name)}</b><div class="muted">${money(p.price)} each</div></div>
-        <div>
-          <button type="button" onclick="qty('${p.id}',-1)">−</button>
-          ${cart[p.id]}
-          <button type="button" onclick="qty('${p.id}',1)">+</button>
-        </div>
-        <b>${money(p.price * cart[p.id])}</b>
-      </div>
-    `).join("")
-    : "<p class='muted'>Your cart is empty.</p>";
-
-  document.getElementById("total").textContent = "Total: " + money(
-    items.reduce((s, p) => s + p.price * cart[p.id], 0)
-  );
-}
-
-function payload() {
-  return products.filter(p => cart[p.id]).map(p => ({
-    product_id: p.id,
-    quantity: cart[p.id]
-  }));
-}
-
-function formData() {
-  return {
-    name: document.getElementById("name").value.trim(),
-    phone: document.getElementById("phone").value.trim(),
-    city: document.getElementById("city").value.trim(),
-    notes: document.getElementById("notes").value.trim()
-  };
-}
-
-async function placeOrder(e) {
-  e.preventDefault();
-
-  if (!db) {
-    alert("Supabase connection is not ready.");
-    return;
-  }
-
-  const f = formData();
-  const items = payload();
-
-  if (!items.length) {
-    alert("Add a product first.");
-    return;
-  }
-
-  const { data, error } = await db.rpc("create_store_order", {
-    p_customer_name: f.name,
-    p_customer_phone: f.phone,
-    p_customer_city: f.city,
-    p_items: items,
-    p_notes: f.notes
-  });
-
-  if (error) {
-    alert("Order could not be saved: " + error.message);
-    console.error("Order error:", error);
-    return;
-  }
-
-  const row = Array.isArray(data) ? data[0] : data;
-  alert("Order saved! Order number: " + row.order_number + " | Total: " + money(row.total));
-  cart = {};
-  drawCart();
-}
-
-function whatsapp() {
-  const f = formData();
-  const items = products.filter(p => cart[p.id]);
-
-  if (!items.length) {
-    alert("Add a product first.");
-    return;
-  }
-
-  const lines = items.map(p =>
-    `${p.name} x ${cart[p.id]} = ${money(p.price * cart[p.id])}`
-  ).join("\n");
-
-  const msg = `Hello Spy World, please confirm this order:
-${lines}
-Estimated total: ${money(items.reduce((s,p) => s + p.price * cart[p.id], 0))}
-Name: ${f.name}
-Mobile: ${f.phone}
-City/PIN: ${f.city}
-Notes: ${f.notes}`;
-
-  window.open("https://wa.me/" + PHONE + "?text=" + encodeURIComponent(msg), "_blank", "noopener");
-}
-
+let db=null, products=[], cart={}, category="All";
+const money=n=>"₹"+Number(n).toLocaleString("en-IN");
+function configured(){return SUPABASE_URL.startsWith("https://")&&!SUPABASE_URL.includes("PASTE_")&&SUPABASE_ANON_KEY.length>20&&!SUPABASE_ANON_KEY.includes("PASTE_")}
+async function init(){if(!configured()){document.getElementById("status").textContent="Setup required: add your Supabase URL and publishable/anon key in this HTML file.";return}
+ db=window.supabase.createClient(SUPABASE_URL,SUPABASE_ANON_KEY);
+ const {data,error}=await db.from("products").select("id,name,category,description,price,image_url,active,created_at").eq("active",true).order("created_at",{ascending:false});
+ if(error){document.getElementById("status").textContent="Could not load products: "+error.message;return}
+ products=data||[];document.getElementById("status").textContent=products.length+" products available • Prices shown in INR";renderFilters();render()}
+function renderFilters(){const cats=["All",...new Set(products.map(p=>p.category))];document.getElementById("filters").innerHTML=cats.map(c=>`<button class="filter ${c===category?"active":""}" onclick="category=${JSON.stringify(c)};renderFilters();render()">${esc(c)}</button>`).join("")}
+function esc(s){return String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]))}
+function render(){const q=(document.getElementById("search").value||"").toLowerCase();const list=products.filter(p=>(category==="All"||p.category===category)&&(p.name+" "+p.description+" "+p.category).toLowerCase().includes(q));
+ document.getElementById("products").innerHTML=list.map(p=>`<article class="card"><div class="art">${p.image_url?`<img src="${esc(p.image_url)}" alt="${esc(p.name)}" style="width:100%;height:100%;object-fit:cover">`:"📷"}</div><div class="info"><h3>${esc(p.name)}</h3><div class="desc">${esc(p.description)}</div><div class="price">${money(p.price)}</div><button class="btn darkbtn" onclick="add('${p.id}')">ADD TO CART</button></div></article>`).join("")||"<p>No products found.</p>";drawCart()}
+function add(id){cart[id]=(cart[id]||0)+1;drawCart()}
+function qty(id,d){cart[id]=(cart[id]||0)+d;if(cart[id]<=0)delete cart[id];drawCart()}
+function drawCart(){let items=products.filter(p=>cart[p.id]);document.getElementById("count").textContent=items.reduce((s,p)=>s+cart[p.id],0);document.getElementById("cart").innerHTML=items.length?items.map(p=>`<div class="cartrow"><div><b>${esc(p.name)}</b><div class="muted">${money(p.price)} each</div></div><div><button type="button" onclick="qty('${p.id}',-1)">−</button> ${cart[p.id]} <button type="button" onclick="qty('${p.id}',1)">+</button></div><b>${money(p.price*cart[p.id])}</b></div>`).join(""):"<p class='muted'>Your cart is empty.</p>";document.getElementById("total").textContent="Total: "+money(items.reduce((s,p)=>s+p.price*cart[p.id],0))}
+function payload(){return products.filter(p=>cart[p.id]).map(p=>({product_id:p.id,quantity:cart[p.id]}))}
+function formData(){return {name:document.getElementById("name").value.trim(),phone:document.getElementById("phone").value.trim(),city:document.getElementById("city").value.trim(),notes:document.getElementById("notes").value.trim()}}
+async function placeOrder(e){e.preventDefault();if(!db){alert("Connect Supabase first.");return}const f=formData(),items=payload();if(!items.length){alert("Add a product first.");return}
+ const {data,error}=await db.rpc("create_store_order",{p_customer_name:f.name,p_customer_phone:f.phone,p_customer_city:f.city,p_items:items,p_notes:f.notes});
+ if(error){alert("Order could not be saved: "+error.message);return}const row=Array.isArray(data)?data[0]:data;alert("Order saved! Order number: "+row.order_number+" | Total: "+money(row.total));cart={};drawCart()}
+function whatsapp(){const f=formData(),items=products.filter(p=>cart[p.id]);if(!items.length){alert("Add a product first.");return}const lines=items.map(p=>`${p.name} x ${cart[p.id]} = ${money(p.price*cart[p.id])}`).join("\n");const msg=`Hello Spy World, please confirm this order:\n${lines}\nEstimated total: ${money(items.reduce((s,p)=>s+p.price*cart[p.id],0))}\nName: ${f.name}\nMobile: ${f.phone}\nCity/PIN: ${f.city}\nNotes: ${f.notes}`;window.open("https://wa.me/"+PHONE+"?text="+encodeURIComponent(msg),"_blank","noopener")}
 init();
-</script>
-</body>
-</html>
+</script></body></html>
